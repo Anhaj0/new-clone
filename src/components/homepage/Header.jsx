@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Logo, ChevronDownIcon, SearchIcon, UserIcon } from "./icons";
+import { ChevronDownIcon, SearchIcon, UserIcon } from "./icons";
+import logoWhite from "../../assets/images/JadetimesLogoWhite.png";
+import logoBlack from "../../assets/images/JadetimesLogoBlack.png";
 
 const MEGA_LINKS = [
   {
@@ -83,6 +85,8 @@ export default function Header() {
     "fixed top-0 left-0 right-0 z-50 transition-all duration-300 " +
     (isScrolled ? "bg-white text-gray-800 shadow-md" : "bg-transparent text-white");
 
+  const logoSrc = isScrolled ? logoBlack : logoWhite;
+
   return (
     <>
       {/* HEADER BAR */}
@@ -90,18 +94,21 @@ export default function Header() {
         <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-3 flex items-center justify-between">
           {/* left side */}
           <div className="flex items-center gap-6">
-            <div className="text-2xl font-bold shrink-0">
-              <Logo />
-            </div>
+            <a href="/" className="block shrink-0" aria-label="Home">
+              <img
+                src={logoSrc}
+                alt="JadeTimes"
+                className="h-8 md:h-9 lg:h-10 w-auto select-none"
+                draggable={false}
+              />
+            </a>
 
             <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-              {/* About us trigger */}
-              <div
-                className="relative"
-                onMouseEnter={() => setOpenMega(true)}
-                onMouseLeave={() => setOpenMega(false)}
-              >
+              {/* About us trigger (click-to-toggle) */}
+              <div className="relative">
                 <button
+                  aria-expanded={openMega}
+                  aria-controls="about-mega"
                   onClick={() => setOpenMega((v) => !v)}
                   className={
                     "flex items-center gap-1 hover:text-blue-500 " +
@@ -143,37 +150,40 @@ export default function Header() {
         </div>
       </header>
 
-      {/* FIXED FULL-WIDTH MEGA PANEL (sits under header) */}
-      {openMega && (
-        <div
-          className="fixed left-0 right-0 z-40"
-          style={{ top: headerH }} // exact offset
-          onMouseEnter={() => setOpenMega(true)}
-          onMouseLeave={() => setOpenMega(false)}
-        >
-          <div className="bg-white text-gray-900 ring-1 ring-black/10 shadow-[0_20px_40px_rgba(0,0,0,0.12)]">
-            <div className="max-w-7xl mx-auto px-6 lg:px-10 py-10">
-              <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
-                {MEGA_LINKS.map((col) => (
-                  <div key={col.heading}>
-                    <h3 className="text-xl font-semibold">{col.heading}</h3>
-                    <span className="block w-16 h-[3px] bg-gray-300 mt-2 mb-4" />
-                    <ul className="space-y-3">
-                      {col.links.map((l) => (
-                        <li key={l}>
-                          <a href="#" className="text-gray-700 hover:text-blue-600">
-                            {l}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
+      {/* FIXED FULL-WIDTH MEGA PANEL (always mounted so open ALSO animates) */}
+      <div
+        id="about-mega"
+        aria-hidden={!openMega}
+        className={
+          "fixed left-0 right-0 z-40 transform-gpu transition-all duration-300 " +
+          (openMega
+            ? "opacity-100 translate-y-0 pointer-events-auto ease-out"
+            : "opacity-0 -translate-y-3 pointer-events-none ease-in")
+        }
+        style={{ top: headerH }}
+      >
+        <div className="bg-white text-gray-900 ring-1 ring-black/10 shadow-[0_20px_40px_rgba(0,0,0,0.12)]">
+          <div className="max-w-7xl mx-auto px-6 lg:px-10 py-10">
+            <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
+              {MEGA_LINKS.map((col) => (
+                <div key={col.heading}>
+                  <h3 className="text-xl font-semibold">{col.heading}</h3>
+                  <span className="block w-16 h-[3px] bg-gray-300 mt-2 mb-4" />
+                  <ul className="space-y-3">
+                    {col.links.map((l) => (
+                      <li key={l}>
+                        <a href="#" className="text-gray-700 hover:text-blue-600">
+                          {l}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           </div>
         </div>
-      )}
+      </div>
     </>
   );
 }
